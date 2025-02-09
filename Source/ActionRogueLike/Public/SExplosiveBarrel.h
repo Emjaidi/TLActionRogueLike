@@ -23,12 +23,18 @@ protected:
 	virtual void BeginPlay() override;
 
 	// For the radial force effect when hit
-	UPROPERTY(VisibleAnywhere)
-	URadialForceComponent* BigBoom;
+	UPROPERTY(VisibleAnywhere, Category = "Force")
+	URadialForceComponent* ForceComp;
 	
 	// Static Mesh Component
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
+	
+	virtual void PostInitializeComponents() override;
+
+	// Must be marked with ufunction in order to 'bind' the event
+	UFUNCTION()
+	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 public:	
