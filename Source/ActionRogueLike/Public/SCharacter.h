@@ -41,6 +41,8 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 	void PrimaryInteract();
 
+	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 

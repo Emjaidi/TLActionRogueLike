@@ -32,6 +32,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp;
 
+	UFUNCTION()
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// BlueprintNativeEvent = C++ base implementation, can be expanded in Blueprints
+	// BlueprintCallable to allow child classes to trigger explosions
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Explode();
 
 public:	
 	// Called every frame

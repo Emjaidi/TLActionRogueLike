@@ -10,7 +10,7 @@
 // Sets default values
 ASCharacter::ASCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
@@ -30,7 +30,7 @@ ASCharacter::ASCharacter()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 
@@ -69,7 +69,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
-	
+
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
 
@@ -100,7 +100,7 @@ void ASCharacter::PrimaryAttack()
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
- 
+
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
@@ -110,7 +110,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this; 
+	SpawnParams.Instigator = this;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 
@@ -121,6 +121,58 @@ void ASCharacter::PrimaryInteract()
 	if (InteractionComp)
 	{
 		InteractionComp->PrimaryInteract();
+	}
+}
+
+void ASCharacter::SpawnProjectile(TSubclassOf<Actor> ClassToSpawn)
+{
+	if (ensureAlways(ClassToSpawn))
+	{
+
+
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		FHitResult Hit;
+
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		// Endpoint
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		// Ignore the player
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParam;
+
+		ObjParam.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParam.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParam.AddObjectTypesToQuery(ECC_Pawn);
+
+		FRotator ProjRotation;
+
+		// True when hit
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParam, Shape, Params))
+		{
+			// Readjust rotation to crosshair
+			ProjRotation = FRotationMatrix::MakeFromX(Hit.ImpactPoint - HandLocation).Rotator();
+		}
+		else
+		{
+			// Could not find a hit
+			ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+		}
+
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
 }
 

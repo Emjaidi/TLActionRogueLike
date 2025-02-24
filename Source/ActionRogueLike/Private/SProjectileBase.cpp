@@ -24,6 +24,9 @@ ASProjectileBase::ASProjectileBase()
 	MovementComp->InitialSpeed = 1000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+
+	//LineTraceComp = CreateDefaultSubobject<ActorLineTraceSingle>("LineTraceComp");
+	//ActorLine
 }
 
 // Called when the game starts or when spawned
@@ -31,6 +34,16 @@ void ASProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Explode();
+}
+
+void ASProjectileBase::Explode_Implementation()
+{
+
 }
 
 // Called every frame
