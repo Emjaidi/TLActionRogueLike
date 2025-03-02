@@ -148,7 +148,7 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 
 		ObjParam.AddObjectTypesToQuery(ECC_WorldDynamic);
 		ObjParam.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParam.AddObjectTypesToQuery(ECC_Visibility);
+		//ObjParam.AddObjectTypesToQuery(ECC_Visibility);
 		ObjParam.AddObjectTypesToQuery(ECC_Pawn);
 
 		FRotator ProjRotation;
