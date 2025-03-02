@@ -43,6 +43,8 @@ protected:
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
+	float AttackAnimDelay;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 

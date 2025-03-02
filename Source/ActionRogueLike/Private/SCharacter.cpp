@@ -24,6 +24,8 @@ ASCharacter::ASCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+	AttackAnimDelay = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -99,21 +101,13 @@ void ASCharacter::PrimaryAttack()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-
+	SpawnProjectile(ProjectileClass);
 }
 
 void ASCharacter::PrimaryInteract()
@@ -124,12 +118,10 @@ void ASCharacter::PrimaryInteract()
 	}
 }
 
-void ASCharacter::SpawnProjectile(TSubclassOf<Actor> ClassToSpawn)
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 {
 	if (ensureAlways(ClassToSpawn))
 	{
-
-
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 		FActorSpawnParameters SpawnParams;
@@ -141,7 +133,9 @@ void ASCharacter::SpawnProjectile(TSubclassOf<Actor> ClassToSpawn)
 		FVector TraceStart = CameraComp->GetComponentLocation();
 
 		// Endpoint
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+		FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000);
+
+		//UE_LOG(LogTemp, Log, TEXT("The vector value is: %s"), *TraceEnd.ToString());
 
 		FCollisionShape Shape;
 		Shape.SetSphere(20.0f);
@@ -154,6 +148,7 @@ void ASCharacter::SpawnProjectile(TSubclassOf<Actor> ClassToSpawn)
 
 		ObjParam.AddObjectTypesToQuery(ECC_WorldDynamic);
 		ObjParam.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParam.AddObjectTypesToQuery(ECC_Visibility);
 		ObjParam.AddObjectTypesToQuery(ECC_Pawn);
 
 		FRotator ProjRotation;
