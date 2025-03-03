@@ -20,6 +20,10 @@ public:
 	ASProjectileBase();
 
 protected:
+
+	UFUNCTION()
+	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -39,6 +43,8 @@ protected:
 	// BlueprintCallable to allow child classes to trigger explosions
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Explode();
+
+
 
 public:	
 	// Called every frame

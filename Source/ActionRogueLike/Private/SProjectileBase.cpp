@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "SAttributeComponent.h"
 
 
 // Sets default values
@@ -15,7 +16,8 @@ ASProjectileBase::ASProjectileBase()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	SphereComp->SetCollisionProfileName("Projectile");
-	RootComponent = SphereComp;
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASProjectileBase::OnActorOverlap);
+	RootComponent = SphereComp; 
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
 	EffectComp->SetupAttachment(SphereComp);
@@ -28,6 +30,18 @@ ASProjectileBase::ASProjectileBase()
 	//LineTraceComp = CreateDefaultSubobject<ActorLineTraceSingle>("LineTraceComp");
 	//ActorLine
 }
+
+//void ASProjectileBase::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor)
+//	{
+//		//USAttributeComponent* AttributeComp = OtherActor->GetComponentByClass(USAttributeComponent::StaticClass());
+//		
+//		ASAttributeComponent* AttributeComp = OtherActor->GetComponentByClass(ASAttributeComponent::StaticClass());
+//	//	USAttribute
+//	}
+//	
+//}
 
 // Called when the game starts or when spawned
 void ASProjectileBase::BeginPlay()
