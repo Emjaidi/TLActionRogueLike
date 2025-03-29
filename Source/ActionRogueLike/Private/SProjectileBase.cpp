@@ -6,6 +6,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include <Misc/AssertionMacros.h>
+#include "UObject/FastReferenceCollector.h"
 
 // Sets default values
 ASProjectileBase::ASProjectileBase()
@@ -58,7 +61,19 @@ void ASProjectileBase::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 void ASProjectileBase::Explode_Implementation()
 {
+	//if (ensure(!IsValid(this)))
+	if (ensure(!IsValid(this)))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 
+		Destroy();
+	}
+}
+
+
+void ASProjectileBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 // Called every frame
