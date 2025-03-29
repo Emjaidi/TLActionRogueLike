@@ -47,6 +47,11 @@ protected:
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+	virtual void PostInitializeComponents() override;
+
 	float AttackAnimDelay;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
