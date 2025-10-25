@@ -8,6 +8,7 @@
 #include "GameFramework\SpringArmComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
 #include "Camera\CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -30,6 +31,8 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 
 	AttackAnimDelay = 0.2f;
+	TimeToHitParamName = "TimeToHit";
+	HandSocketName = "Muzzle_01";
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +79,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 
+	//Used generic name "SecondaryAttack" for binding
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::BlackHoleAttack);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::Dash);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
 
@@ -112,6 +118,30 @@ void ASCharacter::PrimaryAttack()
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
 	SpawnProjectile(ProjectileClass);
+}
+
+void ASCharacter::BlackHoleAttack()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this, &ASCharacter::BlackHoleAttack_TimeElapsed, AttackAnimDelay);
+}
+
+void ASCharacter::BlackHoleAttack_TimeElapsed()
+{
+	SpawnProjectile(BlackHoleProjectileClass);
+}
+
+void ASCharacter::Dash()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed, AttackAnimDelay);
+}
+
+void ASCharacter::Dash_TimeElapsed()
+{
+	SpawnProjectile(DashProjectileClass);
 }
 
 void ASCharacter::PrimaryInteract()
@@ -189,5 +219,10 @@ void ASCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+}
+
+void ASCharacter::StartAttackEffects()
+{
+
 }
 

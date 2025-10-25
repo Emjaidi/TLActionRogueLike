@@ -8,6 +8,9 @@
 #include "SAttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Misc/AssertionMacros.h>
+#include "Sound/SoundCue.h"
+#include "Camera/CameraShakeBase.h"
+#include "Components/AudioComponent.h"
 #include "UObject/FastReferenceCollector.h"
 
 // Sets default values
@@ -25,19 +28,19 @@ ASProjectileBase::ASProjectileBase()
 	EffectComp->SetupAttachment(SphereComp);
 
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 1000.0f;
+	MovementComp->InitialSpeed = 8000;
+	MovementComp->ProjectileGravityScale = 0.0f;
+	
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
+
+	ImpactShakeInnerRadius = 250.0f;
+	ImpactShakeOuterRadius = 2500.0f;
 	//LineTraceComp = CreateDefaultSubobject<ActorLineTraceSingle>("LineTraceComp");
 	//ActorLine
-}
-
-// Called when the game starts or when spawned
-void ASProjectileBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -65,6 +68,10 @@ void ASProjectileBase::Explode_Implementation()
 	if (ensure(!IsValid(this)))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+		UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
+
+
 
 		Destroy();
 	}
@@ -75,11 +82,3 @@ void ASProjectileBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 }
-
-// Called every frame
-void ASProjectileBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
