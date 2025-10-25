@@ -36,10 +36,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
-	UPROPERTY(EditAnywhere, Category = "Effects")
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
 
-	UPROPERTY(EditAnywhere, Category = "Effects")
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName HandSocketName;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")

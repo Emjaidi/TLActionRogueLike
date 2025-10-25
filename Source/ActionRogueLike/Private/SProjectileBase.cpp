@@ -64,9 +64,6 @@ void ASProjectileBase::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 void ASProjectileBase::Explode_Implementation()
 {
-	//if (ensure(!IsValid(this)))
-	if (ensure(!IsValid(this)))
-	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 		UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
@@ -74,7 +71,6 @@ void ASProjectileBase::Explode_Implementation()
 
 
 		Destroy();
-	}
 }
 
 
